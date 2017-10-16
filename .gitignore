@@ -99,3 +99,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# wct lib
+/wct-4.0.6/
