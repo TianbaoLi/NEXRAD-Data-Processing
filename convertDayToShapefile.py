@@ -30,9 +30,9 @@ for x in itemlist:
 	file = getText(x.childNodes)
 	print "Processing %s " % file
 	# Example converting to Shapefile
-	call(["sh", "wct-4.0.1/wct-export", "%s/%s"%(bucketURL,file), "output", "shp", "wct-4.0.1/wctBatchConfig.xml"])
+	call(["sh", "wct-4.0.6/wct-export", "%s/%s"%(bucketURL,file), "output", "shp", "wct-4.0.6/wctBatchConfig.xml"])
 
 	# Example converting to Radial NetCDF
-	#call(["sh", "wct-4.0.1/wct-export", "%s/%s"%(bucketURL,file), "output", "rnc", "wct-4.0.1/wctBatchConfig.xml"])
+	#call(["sh", "wct-4.0.6/wct-export", "%s/%s"%(bucketURL,file), "output", "rnc", "wct-4.0.6/wctBatchConfig.xml"])
 
 
