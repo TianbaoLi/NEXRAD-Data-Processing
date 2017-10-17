@@ -50,7 +50,7 @@ def plot_radar_images(plots):
 #plot_radar_images(plots)
 
 refl_grid = radar.get_field(0, 'reflectivity')
-print refl_grid[0]
+#print refl_grid[0]
 rhohv_grid = radar.get_field(0, 'cross_correlation_ratio')
 zdr_grid = radar.get_field(0, 'differential_reflectivity')
 
@@ -59,10 +59,10 @@ reflow = np.less(refl_grid, 20)
 zdrhigh = np.greater(np.abs(zdr_grid), 2.3)
 rhohvlow = np.less(rhohv_grid, 0.95)
 notweather = np.logical_or(reflow, np.logical_or(zdrhigh, rhohvlow))
-print notweather[0]
+#print notweather[0]
 
 qcrefl_grid = ma.masked_where(notweather, refl_grid)
-print qcrefl_grid[0]
+#print qcrefl_grid[0]
 
 # let's create a new object containing only sweep=0 so we can add the QC'ed ref to it for plotting
 qced = radar.extract_sweeps([0])
