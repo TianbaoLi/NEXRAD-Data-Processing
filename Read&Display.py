@@ -20,12 +20,8 @@ plotsAll = [
     ['velocity', 'Velocity (m/s)', 1],
     ['spectrum_width', 'Spectrum Width', 1]
 ]
-
-reflectivityPlots = [
-        # variable-name in pyart, display-name that we want, sweep-number of radar (0=lowest ref, 1=lowest velocity)
-        ['reflectivity', 'Reflectivity (dBZ)', 0],
-        ['reflectivityqc', 'QCed Reflectivity (dBZ)', 0]
-    ]
+reflectivityPlot = ['reflectivity', 'Reflectivity (dBZ)', 0]
+reflectivityQCedPlot = ['reflectivityqc', 'QCed Reflectivity (dBZ)', 0]
 
 
 def getListText(nodelist):
@@ -85,6 +81,18 @@ def gen_radar_images(display, fig, radar, plots):
         display.set_limits((-300, 300), (-300, 300), ax=ax)
         display.set_aspect_ratio('equal', ax=ax)
         display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black', ax=ax)
+        plt.show()
+
+
+def gen_single_radar_image(display, fig, radar, plot):
+    # display the lowest elevation scan data
+    display.plot(plot[0], plot[2], title=plot[1],
+                 colorbar_label='',
+                 axislabels=('East-West distance from radar (km)',
+                             'North-South distance from radar (km)'))
+    display.set_limits((-300, 300), (-300, 300))
+    display.set_aspect_ratio('equal')
+    display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
     plt.show()
 
 
@@ -108,9 +116,11 @@ def plot_radar_images(radar, plots):
     qced = radar.extract_sweeps([0])
     qced.add_field_like('reflectivity', 'reflectivityqc', qcrefl_grid)
     display = pyart.graph.RadarDisplay(qced)
-    fig = plt.figure(figsize=(11, 5))
 
-    gen_radar_images(display, fig, radar, plots)
+    #fig = plt.figure(figsize=(11, 5))
+    fig = plt.figure()
+
+    gen_single_radar_image(display, fig, radar, plots)
 
 
 def main():
@@ -118,7 +128,8 @@ def main():
     for file in files:
         radar = setAWSConnection(file)
         #gen_radar_images(radar, plotsAll)
-        plot_radar_images(radar, reflectivityPlots)
+        plot_radar_images(radar, reflectivityPlot)
+        plot_radar_images(radar, reflectivityQCedPlot)
 
 if __name__ == "__main__":
     main()
