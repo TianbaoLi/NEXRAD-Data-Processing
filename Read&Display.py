@@ -5,11 +5,11 @@ import pyart.graph
 import tempfile
 import pyart.io
 import boto
+import math
+import os
 from xml.dom import minidom
 from urllib import urlopen
 
-date = "2016/01/01"
-site = "KGSP"
 
 plotsAll = [
     # variable-name in pyart, display-name that we want, sweep-number of radar (0=lowest ref, 1=lowest velocity)
@@ -32,7 +32,7 @@ def getListText(nodelist):
     return ''.join(rc)
 
 
-def getDayFiles():
+def getDayFiles(date, site):
     bucketURL = "http://noaa-nexrad-level2.s3.amazonaws.com"
     dirListURL = bucketURL + "/?prefix=" + date + "/" + site
 
@@ -51,6 +51,30 @@ def getDayFiles():
         files.append(file)
 
     return files
+
+
+def startDownloading(files, date, site):
+    date = date.replace('/', '')
+    indexWidth = int(math.log10(len(files))) + 1
+    cwd = os.getcwd()
+    targetDir = cwd + '/' + site + date
+    try:
+        os.mkdir(targetDir, 0755)
+    except OSError, e:
+        if e.errno != os.errno.EEXIST:
+            raise
+        pass
+
+    for file in files:
+        index = str(files.index(file)).zfill(indexWidth)
+        suffix ='@' + site + '@' + date + '@' + index
+        radar = setAWSConnection(file)
+        plot_radar_images(radar, reflectivityPlot)
+        #plt.show()
+        plt.savefig(targetDir + '/' + 'Ref' + suffix)
+        plot_radar_images(radar, reflectivityQCedPlot)
+        #plt.show()
+        plt.savefig(targetDir + '/' + 'QCed' + suffix)
 
 
 def setAWSConnection(file):
@@ -93,7 +117,6 @@ def gen_single_radar_image(display, fig, radar, plot):
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
     display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
-    plt.show()
 
 
 def plot_radar_images(radar, plots):
@@ -124,12 +147,11 @@ def plot_radar_images(radar, plots):
 
 
 def main():
-    files = getDayFiles()
-    for file in files:
-        radar = setAWSConnection(file)
-        #gen_radar_images(radar, plotsAll)
-        plot_radar_images(radar, reflectivityPlot)
-        plot_radar_images(radar, reflectivityQCedPlot)
+    date = "2016/01/01"
+    site = "KGSP"
+    files = getDayFiles(date, site)
+    startDownloading(files, date, site)
+
 
 if __name__ == "__main__":
     main()
