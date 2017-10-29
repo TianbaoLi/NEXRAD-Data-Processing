@@ -65,14 +65,17 @@ def startDownloading(files, date, site):
             raise
         pass
 
+    fig = plt.figure()
     for file in files:
         index = str(files.index(file)).zfill(indexWidth)
         suffix ='@' + site + '@' + date + '@' + index
         radar = setAWSConnection(file)
-        plot_radar_images(radar, reflectivityPlot)
+        fig.clf()
+        plot_radar_images(radar, fig, reflectivityPlot)
         #plt.show()
         plt.savefig(targetDir + '/' + 'Ref' + suffix)
-        plot_radar_images(radar, reflectivityQCedPlot)
+        fig.clf()
+        plot_radar_images(radar, fig, reflectivityQCedPlot)
         #plt.show()
         plt.savefig(targetDir + '/' + 'QCed' + suffix)
 
@@ -119,7 +122,7 @@ def gen_single_radar_image(display, fig, radar, plot):
     display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
 
 
-def plot_radar_images(radar, plots):
+def plot_radar_images(radar, fig, plots):
     refl_grid = radar.get_field(0, 'reflectivity')
     #print refl_grid[0]
     rhohv_grid = radar.get_field(0, 'cross_correlation_ratio')
@@ -141,7 +144,6 @@ def plot_radar_images(radar, plots):
     display = pyart.graph.RadarDisplay(qced)
 
     #fig = plt.figure(figsize=(11, 5))
-    fig = plt.figure()
 
     gen_single_radar_image(display, fig, radar, plots)
 
