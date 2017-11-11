@@ -73,11 +73,26 @@ def startDownloading(files, date, site):
         fig.clf()
         plot_radar_images(radar, fig, reflectivityPlot)
         #plt.show()
-        plt.savefig(targetDir + '/' + 'Ref' + suffix)
+        save_Fig(fig, plt, targetDir, suffix)
         fig.clf()
         plot_radar_images(radar, fig, reflectivityQCedPlot)
         #plt.show()
-        plt.savefig(targetDir + '/' + 'QCed' + suffix)
+        save_Fig(fig, plt, targetDir, suffix)
+
+
+def save_Fig(fig, plt, targetDir, suffix):
+    fig_size = fig.get_size_inches()
+    w, h = fig_size[0], fig_size[1]
+    fig.patch.set_alpha(0)
+    a = fig.gca()
+    a.set_frame_on(False)
+    a.set_xticks([])
+    a.set_yticks([])
+    plt.axis('off')
+    plt.xlim(0, h)
+    plt.ylim(w, 0)
+    plt.axis('off')
+    plt.savefig(targetDir + '/' + 'Ref' + suffix, bbox_inches='tight', pad_inches=0)
 
 
 def setAWSConnection(file):
