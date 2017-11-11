@@ -65,15 +65,15 @@ def startDownloading(files, date, site):
             raise
         pass
 
-    fig = plt.figure()
+    fig = plt.figure(frameon = False)
     for file in files:
         index = str(files.index(file)).zfill(indexWidth)
         suffix ='@' + site + '@' + date + '@' + index
         radar = setAWSConnection(file)
-        fig.clf()
-        plot_radar_images(radar, fig, reflectivityPlot)
+        #fig.clf()
+        #plot_radar_images(radar, fig, reflectivityPlot)
         #plt.show()
-        save_Fig(fig, plt, targetDir, suffix)
+        #save_Fig(fig, plt, targetDir, suffix)
         fig.clf()
         plot_radar_images(radar, fig, reflectivityQCedPlot)
         #plt.show()
@@ -81,18 +81,11 @@ def startDownloading(files, date, site):
 
 
 def save_Fig(fig, plt, targetDir, suffix):
-    fig_size = fig.get_size_inches()
-    w, h = fig_size[0], fig_size[1]
-    fig.patch.set_alpha(0)
-    a = fig.gca()
-    a.set_frame_on(False)
-    a.set_xticks([])
-    a.set_yticks([])
-    plt.axis('off')
-    plt.xlim(0, h)
-    plt.ylim(w, 0)
-    plt.axis('off')
-    plt.savefig(targetDir + '/' + 'Ref' + suffix, bbox_inches='tight', pad_inches=0)
+    fig.subplots_adjust(bottom=0)
+    fig.subplots_adjust(top=1)
+    fig.subplots_adjust(right=1)
+    fig.subplots_adjust(left=0)
+    fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
 
 
 def setAWSConnection(file):
