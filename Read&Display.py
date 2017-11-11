@@ -81,10 +81,10 @@ def startDownloading(files, date, site):
 
 
 def save_Fig(fig, plt, targetDir, suffix):
-    fig.subplots_adjust(bottom=0)
-    fig.subplots_adjust(top=1)
-    fig.subplots_adjust(right=1)
-    fig.subplots_adjust(left=0)
+    #fig.subplots_adjust(bottom=0)
+    #fig.subplots_adjust(top=1)
+    #fig.subplots_adjust(right=1)
+    #fig.subplots_adjust(left=0)
     fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
 
 
@@ -121,10 +121,7 @@ def gen_radar_images(display, fig, radar, plots):
 
 def gen_single_radar_image(display, fig, radar, plot):
     # display the lowest elevation scan data
-    display.plot(plot[0], plot[2], title=plot[1],
-                 colorbar_label='',
-                 axislabels=('East-West distance from radar (km)',
-                             'North-South distance from radar (km)'))
+    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''))
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
     display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
