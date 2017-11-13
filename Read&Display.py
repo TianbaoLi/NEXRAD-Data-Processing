@@ -1,4 +1,6 @@
 import datetime
+import matplotlib
+matplotlib.use('agg', warn = False, force = True)
 import matplotlib.pyplot as plt
 import multiprocessing
 import numpy.ma as ma
