@@ -42,7 +42,7 @@ def getDayFiles(date, site):
 
     xmldoc = minidom.parse(urlopen(dirListURL))
     itemlist = xmldoc.getElementsByTagName('Key')
-    print len(itemlist), "keys found..."
+    print date, len(itemlist), "keys found"
 
     # For this test, WCT is downloaded and unzipped directly in the working directory
     # The output files are going in 'output'
@@ -59,7 +59,7 @@ def startDownloading(files, date, site):
     date = date.replace('/', '')
     indexWidth = int(math.log10(len(files))) + 1
     cwd = os.getcwd()
-    targetDir = cwd + '/' + site + date
+    targetDir = cwd + '/' + site + '/' + date
     try:
         os.mkdir(targetDir, 0755)
     except OSError, e:
@@ -171,7 +171,15 @@ def run_in_range(date_start, date_end, site, pool_size):
     while iter <= date_end:
         date_list.append((iter.strftime("%Y/%m/%d"), site))
         iter += delta
-    print date_list
+
+    cwd = os.getcwd()
+    targetDir = cwd + '/' + site
+    try:
+        os.mkdir(targetDir, 0755)
+    except OSError, e:
+        if e.errno != os.errno.EEXIST:
+            raise
+        pass
 
     pool = multiprocessing.Pool(pool_size)
     pool.map(process_args_wrapper, date_list)
@@ -181,9 +189,9 @@ def run_in_range(date_start, date_end, site, pool_size):
 
 
 def main():
-    date_start = datetime.date(2016, 01, 01)
-    date_end = datetime.date(2016, 01, 10)
-    site = "KGSP"
+    date_start = datetime.date(2017, 01, 01)
+    date_end = datetime.date(2017, 10, 31)
+    site = "KATX"
     pool_size = 5
     run_in_range(date_start, date_end, site, pool_size)
 
