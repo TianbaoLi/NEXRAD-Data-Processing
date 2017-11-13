@@ -1,4 +1,6 @@
+import datetime
 import matplotlib.pyplot as plt
+import multiprocessing
 import numpy.ma as ma
 import numpy as np
 import pyart.graph
@@ -70,15 +72,15 @@ def startDownloading(files, date, site):
         index = str(files.index(file)).zfill(indexWidth)
         suffix ='@' + site + '@' + date + '@' + index
         radar = setAWSConnection(file)
-        
+
         #plt.show()
         #save_Fig(fig, plt, targetDir, suffix)
 
         #plt.show()
-        save_Fig(fig, plt, radar, targetDir, suffix)
+        saveFig(fig, plt, radar, targetDir, suffix)
 
 
-def save_Fig(fig, plt, radar, targetDir, suffix):
+def saveFig(fig, plt, radar, targetDir, suffix):
     fig.clf()
     plot_radar_images(radar, fig, reflectivityQCedPlot)
     fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
@@ -152,11 +154,38 @@ def plot_radar_images(radar, fig, plots):
     gen_single_radar_image(display, fig, radar, plots)
 
 
+def run_simple_process(iter_str, site):
+    print "Start to deal with", iter_str
+    files = getDayFiles(iter_str, site)
+    startDownloading(files, iter_str, site)
+
+
+def process_args_wrapper(args):
+    run_simple_process(*args)
+
+
+def run_in_range(date_start, date_end, site, pool_size):
+    iter = date_start
+    delta = datetime.timedelta(days = 1)
+    date_list = []
+    while iter <= date_end:
+        date_list.append((iter.strftime("%Y/%m/%d"), site))
+        iter += delta
+    print date_list
+
+    pool = multiprocessing.Pool(pool_size)
+    pool.map(process_args_wrapper, date_list)
+    pool.close()
+    pool.join()
+
+
+
 def main():
-    date = "2016/01/01"
+    date_start = datetime.date(2016, 01, 01)
+    date_end = datetime.date(2016, 01, 10)
     site = "KGSP"
-    files = getDayFiles(date, site)
-    startDownloading(files, date, site)
+    pool_size = 5
+    run_in_range(date_start, date_end, site, pool_size)
 
 
 if __name__ == "__main__":
