@@ -70,21 +70,17 @@ def startDownloading(files, date, site):
         index = str(files.index(file)).zfill(indexWidth)
         suffix ='@' + site + '@' + date + '@' + index
         radar = setAWSConnection(file)
-        #fig.clf()
-        #plot_radar_images(radar, fig, reflectivityPlot)
+        
         #plt.show()
         #save_Fig(fig, plt, targetDir, suffix)
-        fig.clf()
-        plot_radar_images(radar, fig, reflectivityQCedPlot)
+
         #plt.show()
-        save_Fig(fig, plt, targetDir, suffix)
+        save_Fig(fig, plt, radar, targetDir, suffix)
 
 
-def save_Fig(fig, plt, targetDir, suffix):
-    #fig.subplots_adjust(bottom=0)
-    #fig.subplots_adjust(top=1)
-    #fig.subplots_adjust(right=1)
-    #fig.subplots_adjust(left=0)
+def save_Fig(fig, plt, radar, targetDir, suffix):
+    fig.clf()
+    plot_radar_images(radar, fig, reflectivityQCedPlot)
     fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
 
 
@@ -121,10 +117,13 @@ def gen_radar_images(display, fig, radar, plots):
 
 def gen_single_radar_image(display, fig, radar, plot):
     # display the lowest elevation scan data
-    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''))
+    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = False)
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
-    display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
+    plt.xticks([])
+    plt.yticks([])
+    plt.gca().set_frame_on(False)
+    #display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
 
 
 def plot_radar_images(radar, fig, plots):
