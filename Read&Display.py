@@ -5,14 +5,14 @@ import matplotlib.pyplot as plt
 import multiprocessing
 import numpy.ma as ma
 import numpy as np
-import pyart.graph
+import pyart
 import tempfile
-import pyart.io
 import boto
 import math
 import os
 from xml.dom import minidom
 from urllib import urlopen
+from pyart import io
 
 
 plotsAll = [
