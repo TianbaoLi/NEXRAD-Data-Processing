@@ -68,7 +68,6 @@ def startDownloading(files, date, site):
         if e.errno != os.errno.EEXIST:
             raise
         pass
-
     fig = plt.figure(frameon = False)
     for file in files:
         index = str(files.index(file)).zfill(indexWidth)
@@ -150,20 +149,17 @@ def plot_radar_images(radar, fig, plots):
     qced = radar.extract_sweeps([0])
     qced.add_field_like('reflectivity', 'reflectivityqc', qcrefl_grid)
     display = pyart.graph.RadarDisplay(qced)
-
     #fig = plt.figure(figsize=(11, 5))
 
     gen_single_radar_image(display, fig, radar, plots)
 
 
-def run_simple_process(iter_str, site):
-    print "Start to deal with", iter_str
+def run_simple_process(args):
+    iter_str, site = args.split('@')
+    print "Start to deal with", iter_str, site
     files = getDayFiles(iter_str, site)
     startDownloading(files, iter_str, site)
-
-
-def process_args_wrapper(args):
-    run_simple_process(*args)
+    print "Done dealing with", iter_str, site
 
 
 def run_in_range(date_start, date_end, site, pool_size):
@@ -171,7 +167,7 @@ def run_in_range(date_start, date_end, site, pool_size):
     delta = datetime.timedelta(days = 1)
     date_list = []
     while iter <= date_end:
-        date_list.append((iter.strftime("%Y/%m/%d"), site))
+        date_list.append(iter.strftime("%Y/%m/%d") + '@' + site)
         iter += delta
 
     cwd = os.getcwd()
@@ -183,16 +179,18 @@ def run_in_range(date_start, date_end, site, pool_size):
             raise
         pass
 
-    pool = multiprocessing.Pool(pool_size)
-    pool.map(process_args_wrapper, date_list)
+    pool = multiprocessing.Pool(processes = pool_size)
+    #print pool.get()
+    pool.map(run_simple_process, date_list)
+
     pool.close()
     pool.join()
 
 
 
 def main():
-    date_start = datetime.date(2017, 01, 01)
-    date_end = datetime.date(2017, 10, 31)
+    date_start = datetime.date(2017, 03, 21)
+    date_end = datetime.date(2017, 03, 23)
     site = "KATX"
     pool_size = 5
     run_in_range(date_start, date_end, site, pool_size)
