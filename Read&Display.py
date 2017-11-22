@@ -178,12 +178,13 @@ def run_in_range(date_start, date_end, site, pool_size):
         arg_list = []
         for file in files:
             index = str(files.index(file)).zfill(indexWidth)
-            arg_list.append(file + '@' + date_str + '@' + site  + '@' + index + '@' + targetDir)
+            #arg_list.append(file + '@' + date_str + '@' + site  + '@' + index + '@' + targetDir)
+            download(file, date_str, site, index, targetDir)
 
-        pool = multiprocessing.Pool(processes = pool_size)
-        pool.map(run_simple_process, arg_list)
-        pool.close()
-        pool.join()
+        #pool = multiprocessing.Pool(processes = pool_size)
+        #pool.map(run_simple_process, arg_list)
+        #pool.close()
+        #pool.join()
 
         print "Done dealing with", date_str, site
         iter += delta
