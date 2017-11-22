@@ -67,6 +67,7 @@ def download(file, date, site, index, targetDir):
     #save_Fig(fig, plt, targetDir, suffix)
     #plt.show()
     saveFig(fig, plt, radar, targetDir, suffix)
+    plt.close(fig)
 
 
 def saveFig(fig, plt, radar, targetDir, suffix):
