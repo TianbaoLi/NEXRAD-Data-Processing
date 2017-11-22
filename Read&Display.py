@@ -57,28 +57,16 @@ def getDayFiles(date, site):
     return files
 
 
-def startDownloading(files, date, site):
+def download(file, date, site, index, targetDir):
     date = date.replace('/', '')
-    indexWidth = int(math.log10(len(files))) + 1
-    cwd = os.getcwd()
-    targetDir = cwd + '/' + site + '/' + date
-    try:
-        os.mkdir(targetDir, 0755)
-    except OSError, e:
-        if e.errno != os.errno.EEXIST:
-            raise
-        pass
+    suffix ='@' + site + '@' + date + '@' + index
+    radar = setAWSConnection(file)
     fig = plt.figure(frameon = False)
-    for file in files:
-        index = str(files.index(file)).zfill(indexWidth)
-        suffix ='@' + site + '@' + date + '@' + index
-        radar = setAWSConnection(file)
 
-        #plt.show()
-        #save_Fig(fig, plt, targetDir, suffix)
-
-        #plt.show()
-        saveFig(fig, plt, radar, targetDir, suffix)
+    #plt.show()
+    #save_Fig(fig, plt, targetDir, suffix)
+    #plt.show()
+    saveFig(fig, plt, radar, targetDir, suffix)
 
 
 def saveFig(fig, plt, radar, targetDir, suffix):
@@ -155,21 +143,11 @@ def plot_radar_images(radar, fig, plots):
 
 
 def run_simple_process(args):
-    iter_str, site = args.split('@')
-    print "Start to deal with", iter_str, site
-    files = getDayFiles(iter_str, site)
-    startDownloading(files, iter_str, site)
-    print "Done dealing with", iter_str, site
+    file, date_str, site, index, targetDir = args.split('@')
+    download(file, date_str, site, index, targetDir)
 
 
 def run_in_range(date_start, date_end, site, pool_size):
-    iter = date_start
-    delta = datetime.timedelta(days = 1)
-    date_list = []
-    while iter <= date_end:
-        date_list.append(iter.strftime("%Y/%m/%d") + '@' + site)
-        iter += delta
-
     cwd = os.getcwd()
     targetDir = cwd + '/' + site
     try:
@@ -179,13 +157,36 @@ def run_in_range(date_start, date_end, site, pool_size):
             raise
         pass
 
-    pool = multiprocessing.Pool(processes = pool_size)
-    #print pool.get()
-    pool.map(run_simple_process, date_list)
+    iter = date_start
+    delta = datetime.timedelta(days = 1)
+    while iter <= date_end:
+        date_str = iter.strftime("%Y/%m/%d")
+        print "Start to deal with", date_str, site
+        files = getDayFiles(date_str, site)
+        date = date_str.replace('/', '')
+        indexWidth = int(math.log10(len(files))) + 1
+        cwd = os.getcwd()
+        targetDir = cwd + '/' + site + '/' + date
 
-    pool.close()
-    pool.join()
+        try:
+            os.mkdir(targetDir, 0755)
+        except OSError, e:
+            if e.errno != os.errno.EEXIST:
+                raise
+            pass
 
+        arg_list = []
+        for file in files:
+            index = str(files.index(file)).zfill(indexWidth)
+            arg_list.append(file + '@' + date_str + '@' + site  + '@' + index + '@' + targetDir)
+
+        pool = multiprocessing.Pool(processes = pool_size)
+        pool.map(run_simple_process, arg_list)
+        pool.close()
+        pool.join()
+
+        print "Done dealing with", date_str, site
+        iter += delta
 
 
 def main():
