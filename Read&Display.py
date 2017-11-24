@@ -195,7 +195,7 @@ def main():
     date_start = datetime.date(2017, 01, 01)
     date_end = datetime.date(2017, 10, 31)
     site = "KATX"
-    pool_size = 5
+    pool_size = 1
     run_in_range(date_start, date_end, site, pool_size)
 
 

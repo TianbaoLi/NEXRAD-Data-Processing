@@ -43,7 +43,7 @@ def plot_radar_images(plots):
         ax = fig.add_subplot(nrows, ncols, plotno)
         display.plot(plot[0], plot[2], ax=ax, title=plot[1],
              colorbar_label='',
-             axislabels=('East-West distance from radar (km)' if plotno == 6 else '', 
+             axislabels=('East-West distance from radar (km)' if plotno == 6 else '',
                          'North-South distance from radar (km)' if plotno == 1 else ''))
         display.set_limits((-300, 300), (-300, 300), ax=ax)
         display.set_aspect_ratio('equal', ax=ax)
