@@ -102,3 +102,7 @@ ENV/
 
 # wct lib
 /wct-4.0.6/
+
+# figures
+/KATX/ #Seattle site
+
