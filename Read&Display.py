@@ -72,6 +72,7 @@ def download(file, date, site, index, targetDir):
 
 def saveFig(fig, plt, radar, targetDir, suffix):
     fig.clf()
+    plt.gray()
     plot_radar_images(radar, fig, reflectivityQCedPlot)
     fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
 
@@ -112,9 +113,12 @@ def gen_single_radar_image(display, fig, radar, plot):
     display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = False)
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
+    ax = fig.add_subplot(1, 1, 1)
+    display.plot_range_rings([300], lw=0.5, col='black', ax=ax)
     plt.xticks([])
     plt.yticks([])
     plt.gca().set_frame_on(False)
+    plt.gray()
     #display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
 
 
