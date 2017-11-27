@@ -72,8 +72,7 @@ def download(file, date, site, index, targetDir):
 
 def saveFig(fig, plt, radar, targetDir, suffix):
     fig.clf()
-    plt.gray()
-    plot_radar_images(radar, fig, reflectivityQCedPlot)
+    plot_radar_images(radar, fig, plotsAll)
     fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
 
 
@@ -110,7 +109,7 @@ def gen_radar_images(display, fig, radar, plots):
 
 def gen_single_radar_image(display, fig, radar, plot):
     # display the lowest elevation scan data
-    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = False)
+    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = True)
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
     ax = fig.add_subplot(1, 1, 1)
@@ -118,7 +117,7 @@ def gen_single_radar_image(display, fig, radar, plot):
     plt.xticks([])
     plt.yticks([])
     plt.gca().set_frame_on(False)
-    plt.gray()
+    #plt.gray()
     #display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
 
 
@@ -142,6 +141,14 @@ def plot_radar_images(radar, fig, plots):
     qced = radar.extract_sweeps([0])
     qced.add_field_like('reflectivity', 'reflectivityqc', qcrefl_grid)
     display = pyart.graph.RadarDisplay(qced)
+
+    data = display._get_data(plots[0], 0, None, True, None)
+    #x, y = display._get_x_y(0, True, True)
+    #print data.shape
+    #print x.shape
+    #print y.shape
+    print data
+
     #fig = plt.figure(figsize=(11, 5))
 
     gen_single_radar_image(display, fig, radar, plots)
