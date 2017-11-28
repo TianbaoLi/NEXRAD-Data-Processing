@@ -12,6 +12,8 @@ import math
 import os
 from xml.dom import minidom
 from urllib import urlopen
+import matplotlib.cm as cm
+import matplotlib.colors as colors
 from pyart import io
 
 
@@ -72,7 +74,7 @@ def download(file, date, site, index, targetDir):
 
 def saveFig(fig, plt, radar, targetDir, suffix):
     fig.clf()
-    plot_radar_images(radar, fig, plotsAll)
+    plot_radar_images(radar, fig, reflectivityQCedPlot)
     fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
 
 
@@ -109,7 +111,7 @@ def gen_radar_images(display, fig, radar, plots):
 
 def gen_single_radar_image(display, fig, radar, plot):
     # display the lowest elevation scan data
-    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = True)
+    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = True, cmap = 'gray')
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
     ax = fig.add_subplot(1, 1, 1)
@@ -117,7 +119,6 @@ def gen_single_radar_image(display, fig, radar, plot):
     plt.xticks([])
     plt.yticks([])
     plt.gca().set_frame_on(False)
-    #plt.gray()
     #display.plot_range_rings(range(100, 350, 100), lw=0.5, col='black')
 
 
@@ -147,7 +148,9 @@ def plot_radar_images(radar, fig, plots):
     #print data.shape
     #print x.shape
     #print y.shape
-    print data
+    #for i in data:
+    #    print [j for j in i]
+    #print data
 
     #fig = plt.figure(figsize=(11, 5))
 
