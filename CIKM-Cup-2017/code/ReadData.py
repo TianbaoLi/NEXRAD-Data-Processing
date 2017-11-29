@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 
 data_folder = '../data/'
 
-set_list = ['train','testA','testB']
-size_list = [10000,2000,2000]
+#set_list = ['train','testA','testB']
+#size_list = [10000,2000,2000]
 
-#set_list = ['firstline']
-#size_list = [2]
+set_list = ['testA']
+size_list = [2000]
 
 for set_name,set_size in zip(set_list,size_list):
     output_file = data_folder + set_name +  '_ubyte.txt'
@@ -49,7 +49,7 @@ for set_name, N_pic in zip(set_list, size_list):
 
                 for i in range(len(data_mat1)):
                     for j in range(len(data_mat1[i])):
-                        data_mat1[i][j] = 1.0 * (data_mat1[i][j] - d_min) / (d_max - d_min) * 255
+                        data_mat1[i][j] = 1.0 * (data_mat1[i][j] - d_min) / (d_max - d_min + 0.01) * 255
                         #data_mat1[i][j] = data_mat1[i][j]
                     #print len(data_mat1), len(data_mat1[0])
                 fig.clf()
