@@ -5,8 +5,12 @@ import matplotlib.pyplot as plt
 
 
 data_folder = '../data/'
-set_list = ['firstline']
-size_list = [2]
+
+set_list = ['train','testA','testB']
+size_list = [10000,2000,2000]
+
+#set_list = ['firstline']
+#size_list = [2]
 
 for set_name,set_size in zip(set_list,size_list):
     output_file = data_folder + set_name +  '_ubyte.txt'
