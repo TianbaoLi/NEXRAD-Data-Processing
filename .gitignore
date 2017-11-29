@@ -104,5 +104,9 @@ ENV/
 /wct-4.0.6/
 
 # figures
-KATX/* #Seattle site
+KATX/*
+#Seattle site
 
+# CIKM-CUp-2017
+/CIKM-Cup-2017/data
+/CIKM-Cup-2017/figure
