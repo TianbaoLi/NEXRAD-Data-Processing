@@ -61,6 +61,65 @@ def getDayFiles(date, site):
     return files
 
 
+def cutInnerCircle(filename):
+    r2 = 300
+    fig_origin = Image.open(filename + '.png').convert("RGBA")
+    fig_origin = fig_origin.resize((r2, r2))
+    circle_limit = Image.new('RGBA', (r2, r2), (255, 255, 255, 0))
+    pim_fig_origin = fig_origin.load()
+    pim_circle_limit = circle_limit.load()
+
+    r = float(r2 / 2)
+    for i in range(r2):
+        for j in range(r2):
+            lx = abs(i - r + 0.5)
+            ly = abs(j - r + 0.5)
+            l = pow(lx, 2) + pow(ly, 2)
+            if l <= pow(r, 2):
+                pim_circle_limit[i, j] = pim_fig_origin[i, j]
+    circle_limit.convert('L')
+    circle_limit.save(filename + '.png')
+
+
+def cutInnerDiamond(filename):
+    r2 = 300
+    fig_origin = Image.open(filename + '.png').convert("RGBA")
+    fig_origin = fig_origin.resize((r2, r2))
+    circle_limit = Image.new('RGBA', (r2, r2), (255, 255, 255, 0))
+    pim_fig_origin = fig_origin.load()
+    pim_circle_limit = circle_limit.load()
+
+    r = float(r2 / 2)
+    for i in range(r2):
+        for j in range(r2):
+            lx = abs(i - r + 0.5)
+            ly = abs(j - r + 0.5)
+            if lx + ly <= r:
+                pim_circle_limit[i, j] = pim_fig_origin[i, j]
+    circle_limit.convert('L')
+    circle_limit.save(filename + '.png')
+
+
+def cutInnerSquare(filename):
+    r2 = int(300.0 / (2 ** 0.5))
+    fig_origin = Image.open(filename + '.png').convert("RGBA")
+    fig_origin = fig_origin.resize((r2, r2))
+    circle_limit = Image.new('RGBA', (r2, r2), (255, 255, 255, 0))
+    pim_fig_origin = fig_origin.load()
+    pim_circle_limit = circle_limit.load()
+
+    r = float(r2 / 2)
+    for i in range(r2):
+        for j in range(r2):
+            lx = abs(i - r + 0.5)
+            ly = abs(j - r + 0.5)
+            if lx <= r and ly <= r:
+                pim_circle_limit[i, j] = pim_fig_origin[i, j]
+    circle_limit.convert('L')
+    #circle_limit = circle_limit.resize((50, 50))
+    circle_limit.save(filename + '.png')
+
+
 def download(file, date, site, index, targetDir):
     date = date.replace('/', '')
     suffix ='@' + site + '@' + date + '@' + index
@@ -75,23 +134,9 @@ def download(file, date, site, index, targetDir):
     saveFig(fig, plt, radar, fig_name)
     plt.close(fig)
 
-    r2= 300
-    fig_origin = Image.open(fig_name + '.png').convert("RGBA")
-    fig_origin = fig_origin.resize((r2, r2), Image.ANTIALIAS)
-    circle_limit = Image.new('RGBA', (r2, r2), (255,255,255,0))
-    pim_fig_origin = fig_origin.load()
-    pim_circle_limit = circle_limit.load()
-
-    r = float(r2 / 2)
-    for i in range(r2):
-        for j in range(r2):
-            lx = abs(i - r + 0.5)
-            ly = abs(j - r + 0.5)
-            l = pow(lx, 2) + pow(ly, 2)
-            if l <= pow(r, 2):
-                pim_circle_limit[i, j] = pim_fig_origin[i, j]
-    circle_limit.convert('L')
-    circle_limit.save(fig_name + '.png')
+    #cutInnerCircle(fig_name)
+    #cutInnerDiamond(fig_name)
+    cutInnerSquare(fig_name)
 
 
 def saveFig(fig, plt, radar, figname):
@@ -196,6 +241,7 @@ def plot_ppi_mask_fixed(
 def gen_single_radar_image(display, fig, radar, plot):
     # display the lowest elevation scan data
     plot_ppi_mask_fixed(display, plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = False, cmap = 'gray')
+    limits = 300.0 / (2 ** 0.5)
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
     ax = fig.add_subplot(1, 1, 1)
@@ -284,7 +330,7 @@ def main():
     date_start = datetime.date(2017, 01, 01)
     date_end = datetime.date(2017, 01, 31)
     site = "KATX"
-    pool_size = 1
+    pool_size = 2
     run_in_range(date_start, date_end, site, pool_size)
 
 
