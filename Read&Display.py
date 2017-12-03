@@ -13,6 +13,7 @@ import os
 from xml.dom import minidom
 from urllib import urlopen
 from pyart.graph import common
+from PIL import Image
 import matplotlib.cm as cm
 import matplotlib.colors as colors
 from pyart import io
@@ -64,19 +65,39 @@ def download(file, date, site, index, targetDir):
     date = date.replace('/', '')
     suffix ='@' + site + '@' + date + '@' + index
     radar = setAWSConnection(file)
-    fig = plt.figure(frameon = False)
+    fig = plt.figure(dpi = 100, frameon = False)
 
     #plt.show()
     #save_Fig(fig, plt, targetDir, suffix)
     #plt.show()
-    saveFig(fig, plt, radar, targetDir, suffix)
+
+    fig_name = targetDir + '/' + 'Qced' + suffix
+    saveFig(fig, plt, radar, fig_name)
     plt.close(fig)
 
+    r2= 300
+    fig_origin = Image.open(fig_name + '.png').convert("RGBA")
+    fig_origin = fig_origin.resize((r2, r2), Image.ANTIALIAS)
+    circle_limit = Image.new('RGBA', (r2, r2), (255,255,255,0))
+    pim_fig_origin = fig_origin.load()
+    pim_circle_limit = circle_limit.load()
 
-def saveFig(fig, plt, radar, targetDir, suffix):
+    r = float(r2 / 2)
+    for i in range(r2):
+        for j in range(r2):
+            lx = abs(i - r + 0.5)
+            ly = abs(j - r + 0.5)
+            l = pow(lx, 2) + pow(ly, 2)
+            if l <= pow(r, 2):
+                pim_circle_limit[i, j] = pim_fig_origin[i, j]
+    circle_limit.convert('L')
+    circle_limit.save(fig_name + '.png')
+
+
+def saveFig(fig, plt, radar, figname):
     fig.clf()
     plot_radar_images(radar, fig, reflectivityQCedPlot)
-    fig.savefig(targetDir + '/' + 'Qced' + suffix, bbox_inches = 'tight', pad_inches = 0)
+    fig.savefig(figname, transparent = True, bbox_inches = 'tight', pad_inches = 0.0)
 
 
 def setAWSConnection(file):
@@ -143,7 +164,7 @@ def plot_ppi_mask_fixed(
     #print data
 
     # mask the data where outside the limits
-    #data = _mask_outside(mask_outside, data, vmin, vmax)
+    data = _mask_outside(mask_outside, data, vmin, vmax)
 
     # plot the data
     if norm is not None:  # if norm is set do not override with vmin/vmax
@@ -178,7 +199,7 @@ def gen_single_radar_image(display, fig, radar, plot):
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
     ax = fig.add_subplot(1, 1, 1)
-    display.plot_range_rings([300], lw=0.5, col='white', ax=ax)
+    #display.plot_range_rings([300], lw=0.5, col='white', ax=ax)
     plt.xticks([])
     plt.yticks([])
     plt.gca().set_frame_on(False)
