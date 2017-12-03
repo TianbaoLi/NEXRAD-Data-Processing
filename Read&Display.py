@@ -12,6 +12,7 @@ import math
 import os
 from xml.dom import minidom
 from urllib import urlopen
+from pyart.graph import common
 import matplotlib.cm as cm
 import matplotlib.colors as colors
 from pyart import io
@@ -109,13 +110,75 @@ def gen_radar_images(display, fig, radar, plots):
         plt.show()
 
 
+def _mask_outside(flag, data, v1, v2):
+    """ Return the data masked outside of v1 and v2 when flag is True.  """
+    if flag:
+        data = np.ma.masked_invalid(data)
+        data = np.ma.masked_outside(data, v1, v2)
+    return data
+
+def plot_ppi_mask_fixed(
+    display, field, sweep=0, mask_tuple=None,
+    vmin=None, vmax=None, norm=None, cmap=None, mask_outside=False,
+    title=None, title_flag=True,
+    axislabels=(None, None), axislabels_flag=True,
+    colorbar_flag=True, colorbar_label=None,
+    colorbar_orient='vertical', edges=True, gatefilter=None,
+    filter_transitions=True, ax=None, fig=None,
+    ticks=None, ticklabs=None, raster=None, **kwargs):
+
+    # parse parameters
+    ax, fig = common.parse_ax_fig(ax, fig)
+    vmin, vmax = common.parse_vmin_vmax(display._radar, field, vmin, vmax)
+    cmap = common.parse_cmap(cmap, field)
+
+    # get data for the plot
+    data = display._get_data(
+        field, sweep, mask_tuple, filter_transitions, gatefilter)
+    x, y = display._get_x_y(sweep, edges, filter_transitions)
+
+    data.fill_value = -100.0
+    data = data.filled()
+    data = np.add(100.0, data)
+    #print data
+
+    # mask the data where outside the limits
+    #data = _mask_outside(mask_outside, data, vmin, vmax)
+
+    # plot the data
+    if norm is not None:  # if norm is set do not override with vmin/vmax
+        vmin = vmax = None
+    vmin = 0
+    vmax = 255
+    pm = ax.pcolormesh(
+        x, y, data, vmin=vmin, vmax=vmax, cmap=cmap, norm=norm, **kwargs)
+
+    if raster is not None:
+        pm.set_rasterized(True)
+
+    if title_flag:
+        display._set_title(field, sweep, title, ax)
+
+    if axislabels_flag:
+        display._label_axes_ppi(axislabels, ax)
+
+    # add plot and field to lists
+    display.plots.append(pm)
+    display.plot_vars.append(field)
+
+    if colorbar_flag:
+        display.plot_colorbar(
+            mappable=pm, label=colorbar_label, orient=colorbar_orient,
+            field=field, ax=ax, fig=fig, ticks=ticks, ticklabs=ticklabs)
+
+
 def gen_single_radar_image(display, fig, radar, plot):
     # display the lowest elevation scan data
-    display.plot(plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = True, cmap = 'gray')
+    plot_ppi_mask_fixed(display, plot[0], plot[2], title = '', colorbar_label = '', axislabels = ('', ''), colorbar_flag = False, cmap = 'gray')
     display.set_limits((-300, 300), (-300, 300))
     display.set_aspect_ratio('equal')
     ax = fig.add_subplot(1, 1, 1)
-    display.plot_range_rings([300], lw=0.5, col='black', ax=ax)
+    display.plot_range_rings([300], lw=0.5, col='white', ax=ax)
     plt.xticks([])
     plt.yticks([])
     plt.gca().set_frame_on(False)
@@ -142,15 +205,6 @@ def plot_radar_images(radar, fig, plots):
     qced = radar.extract_sweeps([0])
     qced.add_field_like('reflectivity', 'reflectivityqc', qcrefl_grid)
     display = pyart.graph.RadarDisplay(qced)
-
-    data = display._get_data(plots[0], 0, None, True, None)
-    #x, y = display._get_x_y(0, True, True)
-    #print data.shape
-    #print x.shape
-    #print y.shape
-    #for i in data:
-    #    print [j for j in i]
-    #print data
 
     #fig = plt.figure(figsize=(11, 5))
 
